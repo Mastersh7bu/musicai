@@ -175,10 +175,10 @@ body{
             <input type="number" class="form-control input_field_bg p-0 text-center card_wrapper_input rounded-pill steps_field" min="1" max="150" value="20" required>
         </div>
     </div>
-    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3 mx-2" style="font-size: 12px;">
+    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3 mx-2 random_seed_btn" style="font-size: 12px;">
         <img src="{% static 'assets/random_seed_icon.png' %}" width="20px">
     </button>
-    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3" style="font-size: 12px;">
+    <button class="input_label_bg p-0 d-flex justify-content-around align-items-center border-0 rounded-pill px-3 prev_seed_btn" style="font-size: 12px;">
         <i class="fas fa-undo text-white"></i>
     </button>
 </div>
@@ -326,8 +326,12 @@ $(".generate_btn").click(function(event){
   let intervalId;
 
   setTimeout(() => {
+    $(".output_log_field").val(`prompt: ${req_data.prompt_ps}, negative prompt: ${req_data.prompt_ng}, sampler: ${req_data.sampler}, seed: ${req_data.seed}, steps: ${req_data.steps}, cfg scale: ${req_data.cfg_scale}, height: ${req_data.height}, width: ${req_data.width} \n\n`);
+  }, 1000);
+
+  setTimeout(() => {
     $(".output_log_field").val("Task started, please wait until it finish...\n");
-  }, 1500);
+  }, 2500);
 
   // Function to add dots to the message
   function addDots() {
@@ -337,11 +341,14 @@ $(".generate_btn").click(function(event){
 
   setTimeout(() => {
     $(".output_log_field").val($(".output_log_field").val() + "progress: ");
-  }, 3000);
+  }, 5000);
 
   setTimeout(() => {
     intervalId = setInterval(addDots, 1000);
-  }, 4500);
+  }, 7000);
+
+  // store previous seed value
+  localStorage.setItem("prev_seed", $(".seed_field").val());
 
   $.ajax({
     url: "{% url 'generator' %}",
@@ -360,6 +367,17 @@ $(".generate_btn").click(function(event){
       }
     }
   });
+});
+
+// random seed generator
+$(".random_seed_btn").click(function() {
+  var randomSeed = Math.floor(Math.random() * 1000); // Generate a random seed number
+  $(".seed_field").val(randomSeed); // Set the random seed number as the value of the input field
+});
+
+// previous seed restore
+$(".prev_seed_btn").click(function(){
+  $(".seed_field").val(localStorage.getItem("prev_seed"));
 });
 
 const downloadBtn = document.getElementById("download_btn");
